@@ -1,0 +1,68 @@
+const electron = require('electron')
+const app = electron.app
+const dialog = require('electron').dialog
+const BrowserWindow = electron.BrowserWindow;
+const path = require('path')
+const url = require('url')
+
+const chokidar = require('chokidar')
+global.chokidar = chokidar
+
+// var ftpClient = require('ftp-client')
+
+// config = {
+//     host: '192.168.188.35',
+//     port: 21,
+//     user: 'upload',
+//     password: 'wilano1337@'
+// }
+// options = {
+//     logging: 'basic'
+// }
+// client = new ftpClient(config, options);
+
+// client.connect(function () {
+//   client.upload(['index.html'], '/', {
+//     overwrite: 'older'
+//   }, function (result) {
+//     console.log(result);
+//   });
+// });
+
+let mainWindow
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 400,
+    height: 600,
+    minWidth: 300,
+    resizable: false,
+    fullscreen: false
+  })
+
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'index.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+
+  // mainWindow.webContents.openDevTools()
+
+  mainWindow.on('closed', function() {
+    mainWindow = null
+  })
+}
+
+app.on('ready', createWindow)
+
+app.on('window-all-closed', function() {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('activate', function() {
+  if (mainWindow === null) {
+    createWindow()
+  }
+})
