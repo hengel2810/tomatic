@@ -1,5 +1,6 @@
 import FTPController from "./FTPController.js"
 import PutDirJob from "./PutDirJob.js"
+import RemoveDirJob from "./RemoveDirJob.js"
 import FileJob from "./FileJob.js"
 
 const remote = window.require('electron').remote;
@@ -11,9 +12,9 @@ class FileWatcher {
 		this.rootPath = rootPath;
 		this.workDir = path.basename(rootPath);
 		this.ftp = new FTPController(host, this.workDir);
-		this.fileAdded = this.fileAdded.bind(this);
-
+		
 		this.dirAdded = this.dirAdded.bind(this);
+		this.dirRemoved = this.dirRemoved.bind(this);
 	}
 	startWatching() {
 		this.fileWatcher = chokidar.watch(this.rootPath, {
@@ -42,15 +43,14 @@ class FileWatcher {
 		// console.log("####################");
 	}
 	dirAdded(eventPath) {
-		// console.log("dirAdded");
+		// console.log("ADD DIR" + eventPath);
 		var dirJob = new PutDirJob(this.workDir, eventPath);
 		this.ftp.addDirJob(dirJob);
-		// console.log("####################");
 	}
 	dirRemoved(eventPath) {
-		// console.log("dirRemoved");
-		// console.log(eventPath);
-		// console.log("####################");
+		// console.log("RM DIR" + eventPath);
+		var dirJob = new RemoveDirJob(this.workDir, eventPath);
+		this.ftp.addDirJob(dirJob);
 	}
 }
 

@@ -80,7 +80,15 @@ class FTPController {
 				})
 			}
 			else if(dirJob.type ===  "removeDir") {
-
+				dirJob.ftpClient.rmdir(dirJob.uploadPath,true,function(err) {
+					if(err) {
+						console.log(err);
+						callback(err);
+					}
+					else {
+						callback(undefined);
+					}
+				})
 			}
 			else {
 				callback(new Error("WRONG DIRJOB TYPE " + dirJob.type));
