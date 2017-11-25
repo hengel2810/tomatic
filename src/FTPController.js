@@ -1,7 +1,7 @@
 const remote = window.require('electron').remote;
 const ftpClient = remote.getGlobal('ftpClient');
 const async = remote.getGlobal('async');
-import DirJob from "./DirJob.js"
+import PutDirJob from "./PutDirJob.js"
 
 class FTPController {
     constructor(host, rootDir) {
@@ -12,7 +12,7 @@ class FTPController {
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
 		
-		this.dirQueue = async.queue(this.createFTPDir, 1);
+		this.dirQueue = async.queue(this.handleDirJob, 1);
 		this.dirQueue.pause();
 		this.dirQueue.drain = function() {
 			console.log('all items have been processed');
@@ -66,21 +66,29 @@ class FTPController {
 			}
 		});
 	}
-	createFTPDir(dirJob, callback) {
+	handleDirJob(dirJob, callback) {
 		if(dirJob.uploadPath) {
-			dirJob.ftpClient.mkdir(dirJob.uploadPath,true,function(err) {
-				if(err) {
-					console.log(err);
-					callback(err);
-				}
-				else {
-					callback(undefined);
-				}
-			})
+			if(dirJob.type ===  "putDir") {
+				dirJob.ftpClient.mkdir(dirJob.uploadPath,true,function(err) {
+					if(err) {
+						console.log(err);
+						callback(err);
+					}
+					else {
+						callback(undefined);
+					}
+				})
+			}
+			else if(dirJob.type ===  "removeDir") {
+
+			}
+			else {
+				callback(new Error("WRONG DIRJOB TYPE " + dirJob.type));
+			}
 		}
 		else {
 			console.error("NO FTP REMOTE PATH");
-			callback(undefined);
+			callback(new Error("NO FTP REMOTE PATH"));
 		}
 	}
 }

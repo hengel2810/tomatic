@@ -1,5 +1,5 @@
 import FTPController from "./FTPController.js"
-import DirJob from "./DirJob.js"
+import PutDirJob from "./PutDirJob.js"
 import FileJob from "./FileJob.js"
 
 const remote = window.require('electron').remote;
@@ -43,7 +43,7 @@ class FileWatcher {
 	}
 	dirAdded(eventPath) {
 		// console.log("dirAdded");
-		var dirJob = new DirJob(this.workDir, eventPath);
+		var dirJob = new PutDirJob(this.workDir, eventPath);
 		this.ftp.addDirJob(dirJob);
 		// console.log("####################");
 	}
