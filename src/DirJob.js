@@ -1,8 +1,14 @@
 class DirJob {
-    constructor(uploadPath) {
-		this.uploadPath = uploadPath;
-		console.log(uploadPath);
- 	}
+    constructor(rootDir, workPath) {
+		this.uploadPath = rootDir + this.inRootDirPath(rootDir, workPath);
+	}
+	inRootDirPath(rootDir, workPath) {
+		var rootDirLength = rootDir.length;
+		var pathBegin = workPath.indexOf(rootDir) + rootDirLength;
+		var pathEnd = workPath.length;
+		var retVal = workPath.substr(pathBegin, pathEnd);
+		return retVal;
+	}
 }
 
 export default DirJob;

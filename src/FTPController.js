@@ -1,24 +1,28 @@
 const remote = window.require('electron').remote;
-var ftpClient = remote.getGlobal('ftpClient');
+const ftpClient = remote.getGlobal('ftpClient');
+const async = remote.getGlobal('async');
 import DirJob from "./DirJob.js"
 
 class FTPController {
     constructor(host, rootDir) {
-		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
 		this.connected = this.connected.bind(this);
+		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
 		this.startUpload = this.startUpload.bind(this);
-		this.startDirUpload = this.startDirUpload.bind(this);
 
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
-		this.isConnected = false;
-		this.currentJob = undefined;
 		
+		this.dirQueue = async.queue(this.createFTPDir, 1);
+		this.dirQueue.pause();
+		this.dirQueue.drain = function() {
+			console.log('all items have been processed');
+		};
+		this.dirQueue.error(function(error, task) {
+			console.error(task);
+		});
+
 		var that = this;
-		this.arrDirJobs = [];
-		this.arrFileJobs = [];
 		this.client.on('ready', function() {
-			that.isConnected = true;
 			that.connected();
 		});
 		this.client.connect({
@@ -28,73 +32,56 @@ class FTPController {
 			password:"wilano1337@"
 		});
 	}
+	connected() {
+		this.initRootRemoteDir();
+	}
 	initRootRemoteDir() {
 		var remotePath = this.rootDir;
 		var that = this;
-		this.createFTPDir(remotePath, function(err){
+		this.client.mkdir(remotePath,true,function(err) {
 			if(err) {
 				console.error("ROOT DIR INIT " + err);
 			}
 			else {
 				that.startUpload();
 			}
-		});
-	}
-	createFTPDir(remotePath, callback) {
-		console.log("CREATE DIR " + remotePath);
-		this.client.mkdir(remotePath,true,function(err) {
-			if(err) {
-				console.log(err);
-				callback(err);
-			}
-			else {
-				callback(undefined);
-			}
 		})
 	}
-	addDirJob(dirJob) {
-		this.arrDirJobs.push(dirJob);
-		this.startUpload();
-	}
-	addFileJob(fileJob) {
-		this.arrFileJobs.push(fileJob);
-		this.startUpload();
-	}
 	startUpload() {
-		if(this.arrDirJobs.length > 0) {
-			this.startDirUpload();
+		if(this.dirQueue.length() > 0) {
+			this.dirQueue.resume();
 		}
 		else {
-			this.startFileUpload();
+			
 		}
+	}	
+	addDirJob(dirJob) {
+		dirJob.ftpClient = this.client;
+		this.dirQueue.push(dirJob, function(err) {
+			if(err) {
+				console.error(err);
+			}
+			else {
+				console.log('REMOTE CREATED ' + dirJob.uploadPath);
+			}
+		});
 	}
-	startDirUpload() {
-		if(this.currentJob === undefined) {
-			this.currentJob = this.arrDirJobs.pop();
-			var that = this;
-			var remotePath = this.rootDir + this.currentJob.uploadPath;
-			this.createFTPDir(remotePath, function(err) {
+	createFTPDir(dirJob, callback) {
+		if(dirJob.uploadPath) {
+			dirJob.ftpClient.mkdir(dirJob.uploadPath,true,function(err) {
 				if(err) {
-					var tmpJob = that.currentJob;
-					that.currentJob = undefined;
-					that.addDirJob(tmpJob);
+					console.log(err);
+					callback(err);
 				}
 				else {
-					that.currentJob = undefined;
-					that.startUpload();
+					callback(undefined);
 				}
-			});
+			})
 		}
 		else {
-			console.error("Job pending");
+			console.error("NO FTP REMOTE PATH");
+			callback(undefined);
 		}
-		
-	}
-	startFileUpload() {
-		
-	}
-	connected() {
-		this.initRootRemoteDir();
 	}
 }
 

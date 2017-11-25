@@ -11,7 +11,6 @@ class FileWatcher {
 		this.rootPath = rootPath;
 		this.workDir = path.basename(rootPath);
 		this.ftp = new FTPController(host, this.workDir);
-		this.inWorkDirPath = this.inWorkDirPath.bind(this);
 		this.fileAdded = this.fileAdded.bind(this);
 
 		this.dirAdded = this.dirAdded.bind(this);
@@ -26,13 +25,6 @@ class FileWatcher {
 		this.fileWatcher.on('unlink', this.fileRemoved);
 		this.fileWatcher.on('addDir', this.dirAdded);
 		this.fileWatcher.on('unlinkDir', this.dirRemoved);
-	}
-	inWorkDirPath(fullPath) {
-		var workDirLength = this.workDir.length;
-		var pathBegin = fullPath.indexOf(this.workDir) + workDirLength;
-		var pathEnd = fullPath.length;
-		var retVal = fullPath.substr(pathBegin, pathEnd);
-		return retVal;
 	}
 	fileAdded(eventPath) {
 		// console.log("fileAdded");
@@ -51,7 +43,8 @@ class FileWatcher {
 	}
 	dirAdded(eventPath) {
 		// console.log("dirAdded");
-		this.ftp.addDirJob(new DirJob(this.inWorkDirPath(eventPath)));
+		var dirJob = new DirJob(this.workDir, eventPath);
+		this.ftp.addDirJob(dirJob);
 		// console.log("####################");
 	}
 	dirRemoved(eventPath) {

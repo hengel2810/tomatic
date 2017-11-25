@@ -7,11 +7,13 @@ const url = require('url')
 const chokidar = require('chokidar')
 const moment = require('moment')
 const ftpClient = require('ftp');
+const async = require('async');
 
 global.chokidar = chokidar;
 global.path = path;
 global.moment = moment;
 global.ftpClient = ftpClient;
+global.async = async;
 
 function upload() {
    
