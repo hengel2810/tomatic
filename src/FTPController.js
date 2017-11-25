@@ -6,23 +6,26 @@ class FTPController {
     constructor(host, rootDir) {
 		this.connected = this.connected.bind(this);
 		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
-		this.startUpload = this.startUpload.bind(this);
+		this.setSync = this.setSync.bind(this);
+		this.startSync = this.startSync.bind(this);
 		this.addPutDirJob = this.addPutDirJob.bind(this);
 		this.addRemoveDirJob = this.addRemoveDirJob.bind(this);
+		this.handleDirJob = this.handleDirJob.bind(this);
 		this.handlePutDirJob = this.handlePutDirJob.bind(this);
 		this.handleRemoveDirJob = this.handleRemoveDirJob.bind(this);
 		this.handleFileJob = this.handleFileJob.bind(this);
-
+		
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
+		this.isSyncing = false;
 		
-		this.putDirQueue = async.queue(this.handlePutDirJob, 1);
+		this.putDirQueue = async.queue(this.handleDirJob, 1);
 		this.putDirQueue.pause();
 		this.putDirQueue.error(function(error, task) {
 			console.error(task);
 		});
 
-		this.removeDirQueue = async.queue(this.handleRemoveDirJob, 1);
+		this.removeDirQueue = async.queue(this.handleDirJob, 1);
 		this.removeDirQueue.pause();
 		this.removeDirQueue.error(function(error, task) {
 			console.error(task);
@@ -57,24 +60,42 @@ class FTPController {
 				console.error("ROOT DIR INIT " + err);
 			}
 			else {
-				that.startUpload();
+				that.startSync();
 			}
 		})
 	}
-	startUpload() {
-		console.log("START UPLOAD");
-		console.log("putDir " + this.putDirQueue.length());
-		console.log("file " + this.fileQueue.length());
-		console.log("remDir " + this.removeDirQueue.length());
-		if(this.putDirQueue.length() > 0) {
+	setSync() {
+		var putDirQueueCount = this.putDirQueue.length();
+		var fileQueueCount = this.fileQueue.length()
+		var removeDirQueueCount = this.removeDirQueue.length();
+		
+		if(putDirQueueCount === 0 && fileQueueCount === 0 && removeDirQueueCount === 0) {
+			if(this.isSyncing === true) {
+				console.log("SYNC ENDS");
+			}
+			this.isSyncing = false;
+		}
+		else {
+			if(this.isSyncing === false) {
+				console.log("SYNC STARTS");
+			}
+			this.isSyncing = true;
+		}
+	}
+	startSync() {
+		var putDirQueueCount = this.putDirQueue.length();
+		var fileQueueCount = this.fileQueue.length()
+		var removeDirQueueCount = this.removeDirQueue.length();
+		if(putDirQueueCount > 0) {
 			this.putDirQueue.resume();
 		}
-		else if(this.putDirQueue.length() === 0 && this.fileQueue.length() > 0) {
+		else if(putDirQueueCount === 0 && fileQueueCount > 0) {
 			this.fileQueue.resume();
 		}
-		else if(this.putDirQueue.length() === 0 && this.fileQueue.length() === 0 && this.removeDirQueue.length() > 0) {
+		else if(putDirQueueCount === 0 && fileQueueCount === 0 && removeDirQueueCount > 0) {
 			this.removeDirQueue.resume();
 		}
+		this.setSync();
 	}	
 	addPutDirJob(putDirJob) {
 		this.fileQueue.pause();
@@ -84,9 +105,9 @@ class FTPController {
 				console.error(err);
 			}
 			else {
-				console.log('DIR ADDED ' + putDirJob.remotePath);
+				// console.log('DIR ADDED ' + putDirJob.remotePath);
 				if(that.putDirQueue.length() === 0) {
-					that.startUpload();
+					that.startSync();
 				}
 			}
 		});
@@ -98,7 +119,7 @@ class FTPController {
 				console.error(err);
 			}
 			else {
-				console.log('DIR REMOVED ' + removeDirJob.remotePath);
+				// console.log('DIR REMOVED ' + removeDirJob.remotePath);
 			}
 		});
 	}
@@ -109,16 +130,34 @@ class FTPController {
 				console.error(err);
 			}
 			else {
-				console.log('FILE EDITED ' + fileJob.remotePath);
+				// console.log('FILE EDITED ' + fileJob.remotePath);
 				if(that.fileQueue.length() === 0) {
-					that.startUpload();
+					that.startSync();
 				}
 			}
 		});
 	}
-	handlePutDirJob(dirJob, callback) {
+	handleDirJob(dirJob, callback) {
 		if(dirJob.remotePath) {
 			if(dirJob.type ===  "putDir") {
+				this.handlePutDirJob(dirJob, callback);
+			}
+			else if(dirJob.type ===  "removeDir") {
+				this.handleRemoveDirJob(dirJob, callback);
+			}
+			else {
+				var err = new Error("WRONG DIRJOB TYPE " + dirJob.type)
+				console.error(err)
+				callback(err);
+			}
+		}
+		else {
+			var err = new Error("DIR NO FTP REMOTE PATH");
+			console.error(err);
+			callback(err);
+		}
+	}
+	handlePutDirJob(dirJob, callback) {
 				this.client.mkdir(dirJob.remotePath,true,function(err) {
 					if(err) {
 						console.error(err);
@@ -128,22 +167,8 @@ class FTPController {
 						callback()
 					}
 				})
-			}
-			else {
-				var err = new Error("WRONG DIRJOB TYPE " + dirJob.type)
-				console.error(err)
-				callback(err);
-			}
-		}
-		else {
-			var err = new Error("DIR NO FTP REMOTE PATH");
-			console.error(err);
-			callback(err);
-		}
 	}
 	handleRemoveDirJob(dirJob, callback) {
-		if(dirJob.remotePath) {
-			if(dirJob.type ===  "removeDir") {
 				this.client.rmdir(dirJob.remotePath, true, function(err) {
 					if(err) {
 						console.error(err);
@@ -153,18 +178,6 @@ class FTPController {
 						callback()
 					}
 				})
-			}
-			else {
-				var err = new Error("WRONG DIRJOB TYPE " + dirJob.type)
-				console.error(err)
-				callback(err);
-			}
-		}
-		else {
-			var err = new Error("DIR NO FTP REMOTE PATH");
-			console.error(err);
-			callback(err);
-		}
 	}
 	handleFileJob(fileJob, callback) {
 		if(fileJob.remotePath && fileJob.localPath) {
