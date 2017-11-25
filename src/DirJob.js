@@ -1,6 +1,6 @@
 class DirJob {
     constructor(rootDir, workPath) {
-		this.uploadPath = rootDir + this.inRootDirPath(rootDir, workPath);
+		this.remotePath = rootDir + this.inRootDirPath(rootDir, workPath);
 	}
 	inRootDirPath(rootDir, workPath) {
 		var rootDirLength = rootDir.length;

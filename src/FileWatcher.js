@@ -1,7 +1,8 @@
 import FTPController from "./FTPController.js"
 import PutDirJob from "./PutDirJob.js"
 import RemoveDirJob from "./RemoveDirJob.js"
-import FileJob from "./FileJob.js"
+import PutFileJob from "./PutFileJob.js"
+import RemoveFileJob from "./RemoveFileJob.js"
 
 const remote = window.require('electron').remote;
 var chokidar = remote.getGlobal('chokidar');
@@ -10,9 +11,12 @@ var path = remote.getGlobal('path');
 class FileWatcher {
     constructor(rootPath, host) {
 		this.rootPath = rootPath;
-		this.workDir = path.basename(rootPath);
-		this.ftp = new FTPController(host, this.workDir);
+		this.rootDir = path.basename(rootPath);
+		this.ftp = new FTPController(host, this.rootDir);
 		
+		this.fileAdded = this.fileAdded.bind(this);
+		this.fileChanged = this.fileChanged.bind(this);
+		this.fileRemoved = this.fileRemoved.bind(this);
 		this.dirAdded = this.dirAdded.bind(this);
 		this.dirRemoved = this.dirRemoved.bind(this);
 	}
@@ -28,29 +32,26 @@ class FileWatcher {
 		this.fileWatcher.on('unlinkDir', this.dirRemoved);
 	}
 	fileAdded(eventPath) {
-		// console.log("fileAdded");
-		// this.ftp.addFileJob(new FileJob(eventPath));
-		// console.log("####################");
+		var fileJob = new PutFileJob(eventPath, this.rootDir);
+		this.ftp.addFileJob(fileJob);
 	}
 	fileChanged(eventPath) {
-		// console.log("fileChanged");
-		// console.log(eventPath);
-		// console.log("####################");
+		var fileJob = new PutFileJob(eventPath, this.rootDir);
+		this.ftp.addFileJob(fileJob);
 	}
 	fileRemoved(eventPath) {
-		// console.log("fileRemoved");
-		// console.log(eventPath);
-		// console.log("####################");
+		var fileJob = new RemoveFileJob(eventPath, this.rootDir);
+		this.ftp.addFileJob(fileJob);
 	}
 	dirAdded(eventPath) {
 		// console.log("ADD DIR" + eventPath);
-		var dirJob = new PutDirJob(this.workDir, eventPath);
-		this.ftp.addDirJob(dirJob);
+		var dirJob = new PutDirJob(this.rootDir, eventPath);
+		this.ftp.addPutDirJob(dirJob);
 	}
 	dirRemoved(eventPath) {
 		// console.log("RM DIR" + eventPath);
-		var dirJob = new RemoveDirJob(this.workDir, eventPath);
-		this.ftp.addDirJob(dirJob);
+		var dirJob = new RemoveDirJob(this.rootDir, eventPath);
+		this.ftp.addRemoveDirJob(dirJob);
 	}
 }
 

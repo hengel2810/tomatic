@@ -59,7 +59,7 @@ class Setup extends React.Component {
 			return (
 				<div className="setupDiv">
 					<div className="setupContentDiv">
-						<div className="ipInputWrapper"><input id="ipInput" className="inputField ipInput" type="text" placeholder="FTP address (IPv4)" name="folder" value="192.168.178.22"/></div>
+						<div className="ipInputWrapper"><input id="ipInput" className="inputField ipInput" type="text" placeholder="FTP address (IPv4)" name="folder" defaultValue="192.168.178.22"/></div>
 						<div className="button submitButton" onClick={this.setIP}>OK</div>
 					</div>
 				</div>
