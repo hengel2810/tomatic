@@ -3,22 +3,31 @@ import PutDirJob from "./PutDirJob.js"
 import RemoveDirJob from "./RemoveDirJob.js"
 import PutFileJob from "./PutFileJob.js"
 import RemoveFileJob from "./RemoveFileJob.js"
+import { config } from "bluebird-lst";
 
 const remote = window.require('electron').remote;
-var chokidar = remote.getGlobal('chokidar');
-var path = remote.getGlobal('path');
+const chokidar = remote.getGlobal('chokidar');
+const path = remote.getGlobal('path');
 
 class FileWatcher {
-    constructor(rootPath, host) {
-		this.rootPath = rootPath;
-		this.rootDir = path.basename(rootPath);
-		this.ftp = new FTPController(host, this.rootDir);
+    constructor(config) {
+
+		this.rootPath = config.path;
+		this.rootDir = path.basename(config.path);
+		var ftpConfig = {
+			host:config.host,
+			user:config.user,
+			password:config.password,
+			synchronizing:config.synchronizing
+		}
+		this.ftp = new FTPController(ftpConfig, this.rootDir);
 		
 		this.fileAdded = this.fileAdded.bind(this);
 		this.fileChanged = this.fileChanged.bind(this);
 		this.fileRemoved = this.fileRemoved.bind(this);
 		this.dirAdded = this.dirAdded.bind(this);
 		this.dirRemoved = this.dirRemoved.bind(this);
+		this.stopWatching = this.stopWatching.bind(this);
 	}
 	startWatching() {
 		this.fileWatcher = chokidar.watch(this.rootPath, {
@@ -30,6 +39,9 @@ class FileWatcher {
 		this.fileWatcher.on('unlink', this.fileRemoved);
 		this.fileWatcher.on('addDir', this.dirAdded);
 		this.fileWatcher.on('unlinkDir', this.dirRemoved);
+	}
+	stopWatching() {
+		this.fileWatcher.close();
 	}
 	fileAdded(eventPath) {
 		var fileJob = new PutFileJob(eventPath, this.rootDir);

@@ -15,58 +15,12 @@ global.moment = moment;
 global.ftpClient = ftpClient;
 global.async = async;
 
-function upload() {
-   
-	// var c = new Client();
-	// c.on('ready', function() {
-	//   	c.put('foo.txt', 'foo.remote-copy.txt', function(err) {
-	// 		if (err) throw err;
-	// 		c.end();
-	// 	});
-	// 	c.mkdir("test/abc/toll",true,function(err) {
-	// 		console.log(err);
-	// 	})
-	// });
-	// var config = {
-	// 	host:"192.168.188.35",
-	// 	port: 21,
-	// 	user:"upload",
-	// 	password:"wilano1337@"
-    // };
-	// c.connect(config);
-
-
-    // var config = {
-	// 	host:"192.168.188.35",
-	// 	port: 21,
-	// 	user:"upload",
-	// 	password:"wilano1337@"
-    // };
-    // var options = {
-    //     logging: 'basic'
-    // };
-    // var client = new ftpClient(config, options);
- 
-	// var path = '/User/henrikengelbrink/Coden/pythonOpenCV';
-	// // var path = '../pythonOpenCV/**'
-	// client.connect(function () {
-	// 	client.upload([path], '/', {
-	// 		overwrite: 'older'
-	// 	}, function (result) {
-	// 		console.log(result);
-	// 	});
-	// });
-}
-// global.upload = upload;
-
-upload();
-
 let mainWindow
 
 function createWindow() {
   	mainWindow = new BrowserWindow({
-		width: 800,//500,
-		height: 600,
+		width: 900,
+		height: 550,
 		minWidth: 300,
 		resizable: false,
 		fullscreen: false

@@ -3,7 +3,7 @@ const ftpClient = remote.getGlobal('ftpClient');
 const async = remote.getGlobal('async');
 
 class FTPController {
-    constructor(host, rootDir) {
+    constructor(config, rootDir) {
 		this.connected = this.connected.bind(this);
 		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
 		this.setSync = this.setSync.bind(this);
@@ -15,6 +15,7 @@ class FTPController {
 		this.handleRemoveDirJob = this.handleRemoveDirJob.bind(this);
 		this.handleFileJob = this.handleFileJob.bind(this);
 		
+		this.synchronizing = config.synchronizing;
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
 		this.isSyncing = false;
@@ -42,12 +43,11 @@ class FTPController {
 			that.connected();
 		});
 		this.client.connect({
-			host:host,
+			host:config.host,
 			port: 21,
-			user:"upload",
-			password:"wilano1337@"
+			user:config.user,
+			password:config.password
 		});
-
 	}
 	connected() {
 		this.initRootRemoteDir();
@@ -71,12 +71,14 @@ class FTPController {
 		
 		if(putDirQueueCount === 0 && fileQueueCount === 0 && removeDirQueueCount === 0) {
 			if(this.isSyncing === true) {
+				this.synchronizing(false);
 				console.log("SYNC ENDS");
 			}
 			this.isSyncing = false;
 		}
 		else {
 			if(this.isSyncing === false) {
+				this.synchronizing(true);
 				console.log("SYNC STARTS");
 			}
 			this.isSyncing = true;
