@@ -16,7 +16,7 @@ div:hover {
 
 .appContent {
 	margin: 0 auto;
-	width: 90%;
+	width: 80%;
 	height: 100vh;
 }
 
@@ -36,7 +36,7 @@ div:hover {
 
 .pathField {
 	width: 100%;
-	margin-top: 25px;
+	margin-top: 40px;
 }
 
 .hostField {
@@ -46,13 +46,13 @@ div:hover {
 
 .userField {
 	width: 46%;
-	margin-top: 25px;
+	margin-top: 20px;
 	float: left;
 }
 
 .passwordField {
 	width: 46%;
-	margin-top: 25px;
+	margin-top: 20px;
 	float: right;
 }
 

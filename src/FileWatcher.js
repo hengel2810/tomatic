@@ -10,7 +10,7 @@ const chokidar = remote.getGlobal('chokidar');
 const path = remote.getGlobal('path');
 
 class FileWatcher {
-    constructor(config) {
+    constructor(config, ftpConnect) {
 
 		this.rootPath = config.path;
 		this.rootDir = path.basename(config.path);
@@ -20,7 +20,7 @@ class FileWatcher {
 			password:config.password,
 			synchronizing:config.synchronizing
 		}
-		this.ftp = new FTPController(ftpConfig, this.rootDir);
+		this.ftp = new FTPController(ftpConfig, this.rootDir, ftpConnect);
 		
 		this.fileAdded = this.fileAdded.bind(this);
 		this.fileChanged = this.fileChanged.bind(this);

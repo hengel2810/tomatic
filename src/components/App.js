@@ -19,12 +19,14 @@ class App extends React.Component {
     	this.state = {
 			config:undefined,
 			isSync:false,
-			inputReady:false
+			inputReady:false,
+			connecting:false
 		}
 		this.inputChanged = this.inputChanged.bind(this);
 		this.selectPath = this.selectPath.bind(this);
 		this.cancel = this.cancel.bind(this);
 		this.start = this.start.bind(this);
+		this.ftpConnect = this.ftpConnect.bind(this);
 		this.synchronizing = this.synchronizing.bind(this);
 	}
 	configFromInput() {
@@ -77,15 +79,32 @@ class App extends React.Component {
 		var config = this.configFromInput();
 		config.synchronizing = this.synchronizing;
 		if(config.isValid()) {
-			fileWatcher = new FileWatcher(config);
+			fileWatcher = new FileWatcher(config, this.ftpConnect);
 			fileWatcher.startWatching();
 			this.setState({
-				config:config
+				config:config,
+				connecting:true
 			})
 		}
 		else {
-			alert("Error config");
+			alert("Ooops ! Problem starting the service. Please check your input data.");
 		}
+	}
+	ftpConnect(err) {
+		if(err) {
+			console.error(err);
+			alert("There was an error connecting to the server. Perhaps the user or the password is wrong.");
+			this.setState({
+				config:undefined,
+				connecting:false
+			})
+		}
+		else {
+			this.setState({
+				connecting:false
+			})
+		}
+		
 	}
 	synchronizing(isSync) {
 		this.setState({
@@ -93,22 +112,20 @@ class App extends React.Component {
 		})
 	}
 	render() {
-		var icon;
-		var text = "";
-		var iconClasses = "";
-		if(this.state.isSync) {
-			icon = refreshIcon;
-			text = "Synchronizing...";
-			iconClasses = "icon rotating";
-		}
-		else if(!this.state.isSync) {
-			icon = checkIcon;
-			text = moment().format('DD.MM.YYYY, hh:mm:ss');
-			iconClasses = "icon";
-		}
-
-		if(this.state.config && this.state.config.isValid()) {
-			console.log("running");
+		if(this.state.config && this.state.config.isValid() && !this.state.connecting) {
+			var icon;
+			var text = "";
+			var iconClasses = "";
+			if(this.state.isSync) {
+				icon = refreshIcon;
+				text = "Synchronizing...";
+				iconClasses = "icon rotating";
+			}
+			else if(!this.state.isSync) {
+				icon = checkIcon;
+				text = moment().format('DD.MM.YYYY, hh:mm:ss');
+				iconClasses = "icon";
+			}
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
@@ -128,8 +145,27 @@ class App extends React.Component {
 				</div>
 			)
 		}
+		else if(this.state.config && this.state.config.isValid() && this.state.connecting) {
+			return (
+				<div className="appWrapper">
+					<div className="appContent">
+						<input defaultValue="/Users/henrikengelbrink/Coden/pythonOpenCV" id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
+						<input defaultValue="192.168.188.35" id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
+						<input defaultValue="upload" id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
+						<input defaultValue="wilano1337@" id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
+						<div id="cancelButton" className="button cancel" onClick={this.cancel}>Cancel</div>
+						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
+						<div className="statusCanvas">
+							<div className="wrapper">
+							<img className="icon rotating" src={refreshIcon}/>
+							<div className="text">Connecting...</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			)
+		}
 		else  if(this.state.inputReady) {
-			console.log("inputReady");
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
@@ -144,7 +180,6 @@ class App extends React.Component {
 			)
 		}
 		else {
-			console.log("start");
 			return (
 				<div className="appWrapper">
 					<div className="appContent">

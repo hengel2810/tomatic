@@ -3,7 +3,7 @@ const ftpClient = remote.getGlobal('ftpClient');
 const async = remote.getGlobal('async');
 
 class FTPController {
-    constructor(config, rootDir) {
+    constructor(config, rootDir, ftpConnect) {
 		this.connected = this.connected.bind(this);
 		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
 		this.setSync = this.setSync.bind(this);
@@ -19,6 +19,7 @@ class FTPController {
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
 		this.isSyncing = false;
+		this.ftpConnect = ftpConnect;
 		
 		this.putDirQueue = async.queue(this.handleDirJob, 1);
 		this.putDirQueue.pause();
@@ -40,7 +41,16 @@ class FTPController {
 
 		var that = this;
 		this.client.on('ready', function() {
+			if(that.ftpConnect) {
+				that.ftpConnect(undefined);
+			}
 			that.connected();
+		});
+		this.client.on('error', function(err) {
+			if(that.ftpConnect) {
+				that.ftpConnect(err);
+			}
+			console.error(err);
 		});
 		this.client.connect({
 			host:config.host,
@@ -49,6 +59,7 @@ class FTPController {
 			password:config.password
 		});
 	}
+	check
 	connected() {
 		this.initRootRemoteDir();
 	}
@@ -72,14 +83,12 @@ class FTPController {
 		if(putDirQueueCount === 0 && fileQueueCount === 0 && removeDirQueueCount === 0) {
 			if(this.isSyncing === true) {
 				this.synchronizing(false);
-				console.log("SYNC ENDS");
 			}
 			this.isSyncing = false;
 		}
 		else {
 			if(this.isSyncing === false) {
 				this.synchronizing(true);
-				console.log("SYNC STARTS");
 			}
 			this.isSyncing = true;
 		}
@@ -150,20 +159,20 @@ class FTPController {
 			else {
 				var err = new Error("WRONG DIRJOB TYPE " + dirJob.type)
 				console.error(err)
-				callback(err);
+				callback();
 			}
 		}
 		else {
 			var err = new Error("DIR NO FTP REMOTE PATH");
 			console.error(err);
-			callback(err);
+			callback();
 		}
 	}
 	handlePutDirJob(dirJob, callback) {
 				this.client.mkdir(dirJob.remotePath,true,function(err) {
 					if(err) {
 						console.error(err);
-						callback(err)
+						callback()
 					}
 					else {
 						callback()
@@ -174,7 +183,7 @@ class FTPController {
 				this.client.rmdir(dirJob.remotePath, true, function(err) {
 					if(err) {
 						console.error(err);
-						callback(err)
+						callback()
 					}
 					else {
 						callback()
@@ -187,7 +196,7 @@ class FTPController {
 				this.client.put(fileJob.localPath, fileJob.remotePath, function(err) {
 					if(err) {
 						console.error(err);
-						callback(err);
+						callback();
 					}
 					else {
 						callback();
@@ -198,7 +207,7 @@ class FTPController {
 				this.client.delete(fileJob.remotePath, function(err) {
 					if(err) {
 						console.error(err);
-						callback(err);
+						callback();
 					}
 					else {
 						callback();
@@ -208,13 +217,13 @@ class FTPController {
 			else {
 				var err = new Error("WRONG FILEJOB TYPE " + fileJob.type)
 				console.error(err)
-				callback(err);
+				callback();
 			}
 		}
 		else {
 			var error = new Error("FILE NO REMOTE OR LOCAL PATH");
 			console.error(error);
-			callback(error);
+			callback();
 		}
 	}
 }
