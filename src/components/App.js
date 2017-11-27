@@ -107,6 +107,11 @@ class App extends React.Component {
 		
 	}
 	synchronizing(isSync) {
+		if(isSync === false) {
+			let myNotification = new Notification('Finished', {
+				body: 'Finished synchronizing with the ftp server'
+			})
+		}
 		this.setState({
 			isSync:isSync
 		})

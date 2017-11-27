@@ -1,7 +1,7 @@
 {
-  "name": "remotepi",
+  "name": "tomatic",
   "version": "1.0.0",
-  "description": "RaspberryPi - FTP - AutoSync",
+  "description": "FTP - AutoSync, especially for Raspberry Pi Development",
   "main": "main.js",
   "scripts": {
     "dist": "electron-builder",

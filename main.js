@@ -2,6 +2,8 @@ const electron = require('electron')
 const app = electron.app
 const dialog = require('electron').dialog
 const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
+
 const path = require('path')
 const url = require('url')
 const chokidar = require('chokidar')
@@ -23,14 +25,31 @@ function createWindow() {
 		height: 550,
 		minWidth: 300,
 		resizable: false,
-		fullscreen: false
+		fullscreen: false,
+		icon: path.join(__dirname, 'src/assets/media/icon.png')
   	})
-
+	mainWindow.setTitle(require('./package.json').name);
 	mainWindow.loadURL(url.format({
 		pathname: path.join(__dirname, 'index.html'),
 		protocol: 'file:',
 		slashes: true
 	}))
+
+	const menuTemplate = [
+		{
+			label: 'tomatic',
+			submenu: [
+				{
+					label: 'Quit',
+					click: () => {
+						app.quit();
+					}
+				}
+			]
+		}
+	];
+	const menu = Menu.buildFromTemplate(menuTemplate);
+	Menu.setApplicationMenu(menu);
 
 	mainWindow.webContents.openDevTools()
 
