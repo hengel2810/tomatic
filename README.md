@@ -1,7 +1,9 @@
 # tomatic
 
 <p align="center">
+	<a href="https://github.com/hengel2810/tomatic/blob/master/README.md"
 	<img alt="tomatic" src="https://raw.githubusercontent.com/hengel2810/tomatic/master/src/assets/icons/icon.png" width="300"/>
+	</a>
 </p>
 
 <br>
