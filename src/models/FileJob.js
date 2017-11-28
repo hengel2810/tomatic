@@ -1,5 +1,6 @@
 class FileJob {
     constructor(localPath, rootDir) {
+		this.failCount = 0;
 		this.localPath = localPath;
 		this.remotePath = this.remotePath(localPath, rootDir);
 	}

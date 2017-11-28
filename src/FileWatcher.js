@@ -1,8 +1,8 @@
 import FTPController from "./FTPController.js"
-import PutDirJob from "./PutDirJob.js"
-import RemoveDirJob from "./RemoveDirJob.js"
-import PutFileJob from "./PutFileJob.js"
-import RemoveFileJob from "./RemoveFileJob.js"
+import PutDirJob from "./models/PutDirJob.js"
+import RemoveDirJob from "./models/RemoveDirJob.js"
+import PutFileJob from "./models/PutFileJob.js"
+import RemoveFileJob from "./models/RemoveFileJob.js"
 import { config } from "bluebird-lst";
 
 const remote = window.require('electron').remote;
@@ -34,6 +34,7 @@ class FileWatcher {
 			ignored: /(^|[\/\\])\../,
 			persistent: true
 		});
+		this.fileWatcher.on('error', this.watchError);
 		this.fileWatcher.on('add', this.fileAdded);
 		this.fileWatcher.on('change', this.fileChanged);
 		this.fileWatcher.on('unlink', this.fileRemoved);
@@ -41,27 +42,34 @@ class FileWatcher {
 		this.fileWatcher.on('unlinkDir', this.dirRemoved);
 	}
 	stopWatching() {
+		// console.log("##### stopWatching #####");
 		this.fileWatcher.close();
 	}
+	watchError(err) {
+		console.error(err);
+	}
 	fileAdded(eventPath) {
+		// console.log("fileAdded" + eventPath);
 		var fileJob = new PutFileJob(eventPath, this.rootDir);
 		this.ftp.addFileJob(fileJob);
 	}
 	fileChanged(eventPath) {
+		// console.log("fileChanged" + eventPath);
 		var fileJob = new PutFileJob(eventPath, this.rootDir);
 		this.ftp.addFileJob(fileJob);
 	}
 	fileRemoved(eventPath) {
+		// console.log("fileRemoved" + eventPath);
 		var fileJob = new RemoveFileJob(eventPath, this.rootDir);
 		this.ftp.addFileJob(fileJob);
 	}
 	dirAdded(eventPath) {
-		// console.log("ADD DIR" + eventPath);
+		// console.log("dirAdded" + eventPath);
 		var dirJob = new PutDirJob(this.rootDir, eventPath);
 		this.ftp.addPutDirJob(dirJob);
 	}
 	dirRemoved(eventPath) {
-		// console.log("RM DIR" + eventPath);
+		// console.log("dirRemoved" + eventPath);
 		var dirJob = new RemoveDirJob(this.rootDir, eventPath);
 		this.ftp.addRemoveDirJob(dirJob);
 	}

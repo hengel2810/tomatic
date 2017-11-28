@@ -1,5 +1,6 @@
 class DirJob {
     constructor(rootDir, workPath) {
+		this.failCount = 0;
 		this.remotePath = rootDir + this.inRootDirPath(rootDir, workPath);
 	}
 	inRootDirPath(rootDir, workPath) {

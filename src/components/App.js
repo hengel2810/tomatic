@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import FileWatcher from "../FileWatcher.js"
-import ConfigObject from "../ConfigObject.js"
+import ConfigObject from "../models/ConfigObject.js"
 import "../assets/css/App.css"
 
 import refreshIcon from '../assets/media/reload.png';
@@ -22,6 +22,17 @@ class App extends React.Component {
 			inputReady:false,
 			connecting:false
 		}
+		this.pathInputValue = "";
+		this.hostInputValue = "";
+		this.userInputValue = "";
+		this.passwordInputValue = "";
+
+		// Local Dev Settings
+		// this.pathInputValue = "/Users/henrikengelbrink/Coden/pythonOpenCV";
+		// this.hostInputValue = "192.168.188.35";
+		// this.userInputValue = "upload";
+		// this.passwordInputValue = "wilano1337@";
+
 		this.inputChanged = this.inputChanged.bind(this);
 		this.selectPath = this.selectPath.bind(this);
 		this.cancel = this.cancel.bind(this);
@@ -38,7 +49,12 @@ class App extends React.Component {
 		return config;
 	}
 	inputChanged() {
-		if(this.configFromInput().isValid()) {
+		var config = this.configFromInput();
+		this.pathInputValue = config.path;
+		this.hostInputValue = config.host;
+		this.userInputValue = config.user;
+		this.passwordInputValue = config.password;
+		if(config.isValid()) {
 			if(!this.state.inputReady) {
 				this.setState({
 					inputReady:true
@@ -103,13 +119,21 @@ class App extends React.Component {
 			this.setState({
 				connecting:false
 			})
-		}
+		} 	
 		
 	}
-	synchronizing(isSync) {
+	synchronizing(isSync, results) {
 		if(isSync === false) {
-			let myNotification = new Notification('Finished', {
-				body: 'Finished synchronizing with the ftp server'
+			var failCount = 0;
+			var successCount = 0;
+			if(results && results.fail) {
+				failCount = results.fail.length;
+			}
+			if(results && results.success) {
+				successCount = results.success.length;
+			}
+			let syncNotification = new Notification("Synchronized", {
+				body: "Finished synchronizing with the ftp server\nSuccess: " + successCount + "\nFail: " + failCount 
 			})
 		}
 		this.setState({
@@ -134,10 +158,10 @@ class App extends React.Component {
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
-						<input disabled defaultValue="/Users/henrikengelbrink/Coden/pythonOpenCV" id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged}/>
-						<input disabled defaultValue="192.168.188.35" id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input disabled defaultValue="upload" id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input disabled defaultValue="wilano1337@" id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
+						<input disabled defaultValue={this.state.config.path} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged}/>
+						<input disabled defaultValue={this.state.config.host} className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
+						<input disabled defaultValue={this.state.config.user} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
+						<input disabled defaultValue={this.state.config.password} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
 						<div id="cancelButton" className="button cancel" onClick={this.cancel}>Cancel</div>
 						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
 						<div className="statusCanvas">
@@ -154,10 +178,10 @@ class App extends React.Component {
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
-						<input defaultValue="/Users/henrikengelbrink/Coden/pythonOpenCV" id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue="192.168.188.35" id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="upload" id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="wilano1337@" id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.state.config.path} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
+						<input defaultValue={this.state.config.host} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.state.config.user} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.state.config.password} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
 						<div id="cancelButton" className="button cancel" onClick={this.cancel}>Cancel</div>
 						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
 						<div className="statusCanvas">
@@ -174,10 +198,10 @@ class App extends React.Component {
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
-						<input defaultValue="/Users/henrikengelbrink/Coden/pythonOpenCV" id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue="192.168.188.35" id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="upload" id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="wilano1337@" id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.pathInputValue} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
+						<input defaultValue={this.hostInputValue} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.userInputValue} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.passwordInputValue} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
 						<div id="cancelButton" className="button cancel cancelDisabled" onClick={this.cancel}>Cancel</div>
 						<div id="startButton" className="button start" onClick={this.start}>Start</div>
 					</div>
@@ -188,10 +212,10 @@ class App extends React.Component {
 			return (
 				<div className="appWrapper">
 					<div className="appContent">
-						<input defaultValue="/Users/henrikengelbrink/Coden/pythonOpenCV" id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue="192.168.188.35" id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="upload" id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue="wilano1337@" id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.pathInputValue} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
+						<input defaultValue={this.hostInputValue} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.userInputValue} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
+						<input defaultValue={this.passwordInputValue} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
 						<div id="cancelButton" className="button cancel cancelDisabled" onClick={this.cancel}>Cancel</div>
 						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
 					</div>

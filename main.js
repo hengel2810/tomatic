@@ -21,12 +21,11 @@ let mainWindow
 
 function createWindow() {
   	mainWindow = new BrowserWindow({
-		width: 900,
+		width: 300,
 		height: 550,
 		minWidth: 300,
 		resizable: false,
-		fullscreen: false,
-		icon: path.join(__dirname, 'src/assets/media/icon.png')
+		fullscreen: false
   	})
 	mainWindow.setTitle(require('./package.json').name);
 	mainWindow.loadURL(url.format({
@@ -51,7 +50,7 @@ function createWindow() {
 	const menu = Menu.buildFromTemplate(menuTemplate);
 	Menu.setApplicationMenu(menu);
 
-	mainWindow.webContents.openDevTools()
+	// mainWindow.webContents.openDevTools()
 
 	mainWindow.on('closed', function() {
 		mainWindow = null
