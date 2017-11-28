@@ -7,8 +7,8 @@
 ## tomatic
 
 <p>
-tomatic is a little development tool which observes a given folder for files changes. 
-On every file change tomatic will synchronize these changes to the configured FTP server. 
+tomatic is a little development tool which observes a given folder for file changes. 
+On every file change, tomatic will synchronize these changes to the configured FTP server. 
 </p>
 
 <p>
