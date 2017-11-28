@@ -4,7 +4,7 @@
 	<img alt="tomatic" src="https://raw.githubusercontent.com/hengel2810/tomatic/master/src/assets/icons/icon.png" width="300"/>
 </p>
 
-## tomatic
+<br>
 
 <p>
 tomatic is a little development tool which observes a given folder for file changes. 
