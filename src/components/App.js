@@ -27,7 +27,6 @@ class App extends React.Component {
 	cancel() {
 		fileWatcher.stopWatching();
 		this.setState({
-			config:undefined,
 			connecting:false,
 			connected:false,
 			isSync:false
