@@ -1,15 +1,9 @@
 import React from "react"
 import ReactDOM from "react-dom"
+import ConfigInput from "./ConfigInput.js"
+import StatusView from "./StatusView.js"
 import FileWatcher from "../FileWatcher.js"
-import ConfigObject from "../models/ConfigObject.js"
 import "../assets/css/App.css"
-
-import refreshIcon from '../assets/media/reload.png';
-import checkIcon from '../assets/media/tick.png';
-
-const dialog = window.require('electron').remote.dialog
-const remote = window.require('electron').remote;
-const moment = remote.getGlobal('moment');
 
 var fileWatcher;
 
@@ -19,80 +13,28 @@ class App extends React.Component {
     	this.state = {
 			config:undefined,
 			isSync:false,
-			inputReady:false,
-			connecting:false
+			connecting:false,
+			connected:false
 		}
-		this.pathInputValue = "";
-		this.hostInputValue = "";
-		this.userInputValue = "";
-		this.passwordInputValue = "";
 
-		// Local Dev Settings
-		// this.pathInputValue = "/Users/henrikengelbrink/Coden/pythonOpenCV";
-		// this.hostInputValue = "192.168.188.35";
-		// this.userInputValue = "upload";
-		// this.passwordInputValue = "wilano1337@";
-
-		this.inputChanged = this.inputChanged.bind(this);
-		this.selectPath = this.selectPath.bind(this);
 		this.cancel = this.cancel.bind(this);
 		this.start = this.start.bind(this);
 		this.ftpConnect = this.ftpConnect.bind(this);
 		this.synchronizing = this.synchronizing.bind(this);
-	}
-	configFromInput() {
-		var path = document.getElementById("pathInput").value;
-		var host = document.getElementById("hostInput").value;
-		var user = document.getElementById("userInput").value;
-		var password = document.getElementById("passwordInput").value;
-		var config = new ConfigObject(path, host, user, password);
-		return config;
-	}
-	inputChanged() {
-		var config = this.configFromInput();
-		this.pathInputValue = config.path;
-		this.hostInputValue = config.host;
-		this.userInputValue = config.user;
-		this.passwordInputValue = config.password;
-		if(config.isValid()) {
-			if(!this.state.inputReady) {
-				this.setState({
-					inputReady:true
-				})
-			}
-		}
-		else {
-			if(this.state.inputReady) {
-				this.setState({
-					inputReady:false
-				})
-			}
-		}
-	}
-	selectPath() {
-		var options = {
-      	  properties:[
-		    "openDirectory"
-		  ]
-		};
-		var that = this;
-		dialog.showOpenDialog(options, function (filePath) { 
-			if(filePath === undefined) { 
-				console.log("No file selected"); 
-			} 
-			else {
-				document.getElementById("pathInput").value = filePath;
-			}
-		});
+		
+		this.configChange = this.configChange.bind(this);
 	}
 	cancel() {
 		fileWatcher.stopWatching();
 		this.setState({
-			config:undefined
+			config:undefined,
+			connecting:false,
+			connected:false,
+			isSync:false
 		})
 	}
 	start() {
-		var config = this.configFromInput();
+		var config = this.state.config;
 		config.synchronizing = this.synchronizing;
 		if(config.isValid()) {
 			fileWatcher = new FileWatcher(config, this.ftpConnect);
@@ -117,7 +59,8 @@ class App extends React.Component {
 		}
 		else {
 			this.setState({
-				connecting:false
+				connecting:false,
+				connected:true
 			})
 		} 	
 		
@@ -140,88 +83,44 @@ class App extends React.Component {
 			isSync:isSync
 		})
 	}
+	configChange(config) {
+		this.setState({
+			config:config
+		});
+	}
 	render() {
-		if(this.state.config && this.state.config.isValid() && !this.state.connecting) {
-			var icon;
-			var text = "";
-			var iconClasses = "";
+		var cancelButtonClass = "button cancel";
+		var startButtonClass = "button start";
+		var validConfig = this.state.config && this.state.config.isValid();
+		var statusType = "";
+		if(!validConfig) {
+			cancelButtonClass = cancelButtonClass + " buttonDisabled";
+			startButtonClass = startButtonClass + " buttonDisabled";
+		}
+		else if(validConfig && (!this.state.connecting && !this.state.connected)) {
+			cancelButtonClass = cancelButtonClass + " buttonDisabled";
+		}
+		else if(validConfig && this.state.connecting) {
+			startButtonClass = startButtonClass + " buttonDisabled";
+			statusType = "sync";
+		}
+		else if(validConfig && this.state.connected) {
+			startButtonClass = startButtonClass + " buttonDisabled";
+			statusType = "info";
 			if(this.state.isSync) {
-				icon = refreshIcon;
-				text = "Synchronizing...";
-				iconClasses = "icon rotating";
+				statusType = "sync";
 			}
-			else if(!this.state.isSync) {
-				icon = checkIcon;
-				text = moment().format('DD.MM.YYYY, hh:mm:ss');
-				iconClasses = "icon";
-			}
-			return (
-				<div className="appWrapper">
-					<div className="appContent">
-						<input disabled defaultValue={this.state.config.path} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged}/>
-						<input disabled defaultValue={this.state.config.host} className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input disabled defaultValue={this.state.config.user} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input disabled defaultValue={this.state.config.password} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
-						<div id="cancelButton" className="button cancel" onClick={this.cancel}>Cancel</div>
-						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
-						<div className="statusCanvas">
-							<div className="wrapper">
-								<img className={iconClasses} src={icon}/>
-								<div className="text">{text}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			)
 		}
-		else if(this.state.config && this.state.config.isValid() && this.state.connecting) {
-			return (
-				<div className="appWrapper">
-					<div className="appContent">
-						<input defaultValue={this.state.config.path} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue={this.state.config.host} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.state.config.user} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.state.config.password} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
-						<div id="cancelButton" className="button cancel" onClick={this.cancel}>Cancel</div>
-						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
-						<div className="statusCanvas">
-							<div className="wrapper">
-							<img className="icon rotating" src={refreshIcon}/>
-							<div className="text">Connecting...</div>
-							</div>
-						</div>
-					</div>
+		return(
+			<div className="appWrapper">
+				<ConfigInput configChange={this.configChange} active={true}/>
+				<div className="buttonWrapper">
+					<div id="cancelButton" className={cancelButtonClass} onClick={this.cancel}>Cancel</div>
+					<div id="startButton" className={startButtonClass} onClick={this.start}>Start</div>
 				</div>
-			)
-		}
-		else  if(this.state.inputReady) {
-			return (
-				<div className="appWrapper">
-					<div className="appContent">
-						<input defaultValue={this.pathInputValue} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue={this.hostInputValue} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.userInputValue} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.passwordInputValue} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
-						<div id="cancelButton" className="button cancel cancelDisabled" onClick={this.cancel}>Cancel</div>
-						<div id="startButton" className="button start" onClick={this.start}>Start</div>
-					</div>
-				</div>
-			)
-		}
-		else {
-			return (
-				<div className="appWrapper">
-					<div className="appContent">
-						<input defaultValue={this.pathInputValue} id="pathInput" className="inputField pathField" type="text" placeholder="path" name="path" onChange={this.inputChanged} onClick={this.selectPath}/>
-						<input defaultValue={this.hostInputValue} id="hostInput" className="inputField hostField" type="text" placeholder="ftp host" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.userInputValue} id="userInput" className="inputField userField" type="text" placeholder="user" name="folder"onChange={this.inputChanged} />
-						<input defaultValue={this.passwordInputValue} id="passwordInput" className="inputField passwordField" type="password" placeholder="password" name="folder"onChange={this.inputChanged} />
-						<div id="cancelButton" className="button cancel cancelDisabled" onClick={this.cancel}>Cancel</div>
-						<div id="startButton" className="button start startDisabled" onClick={this.start}>Start</div>
-					</div>
-				</div>
-			)
-		}
+				<StatusView status={statusType}/>
+			</div>
+		)
 	}
 }
 

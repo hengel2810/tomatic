@@ -21,7 +21,7 @@ let mainWindow
 
 function createWindow() {
   	mainWindow = new BrowserWindow({
-		width: 300,
+		width: 900,
 		height: 550,
 		minWidth: 300,
 		resizable: false,
@@ -50,7 +50,7 @@ function createWindow() {
 	const menu = Menu.buildFromTemplate(menuTemplate);
 	Menu.setApplicationMenu(menu);
 
-	// mainWindow.webContents.openDevTools()
+	mainWindow.webContents.openDevTools()
 
 	mainWindow.on('closed', function() {
 		mainWindow = null

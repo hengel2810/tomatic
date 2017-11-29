@@ -1,0 +1,34 @@
+.statusCanvas {
+	width: 80%;
+	margin: 50px auto;
+	height: 140px;
+	background-color: white;
+	border-radius: 5px;
+	padding: 10px 0;
+	box-sizing: border-box;
+}
+
+.statusCanvas > .icon {
+	width: 60px;
+	height: 60px;
+	display: block;
+	margin: 15px auto 10px auto;
+}
+
+.statusCanvas > .rotating {
+	animation:rotateAnimation 4s linear infinite;
+}
+
+@keyframes rotateAnimation { 
+	from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+.statusCanvas > .text {
+	width:100%;
+	font-size: 16px;
+	padding: 10px;
+	box-sizing: border-box;
+	text-align: center;
+	color: #333333;
+}

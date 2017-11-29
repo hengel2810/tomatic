@@ -30,6 +30,7 @@ class FileWatcher {
 		this.stopWatching = this.stopWatching.bind(this);
 	}
 	startWatching() {
+		this.ftp.start();
 		this.fileWatcher = chokidar.watch(this.rootPath, {
 			ignored: /(^|[\/\\])\../,
 			persistent: true
@@ -43,6 +44,7 @@ class FileWatcher {
 	}
 	stopWatching() {
 		// console.log("##### stopWatching #####");
+		this.ftp.stop();
 		this.fileWatcher.close();
 	}
 	watchError(err) {

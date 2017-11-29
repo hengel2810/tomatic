@@ -1,0 +1,40 @@
+.configInput {
+	margin: 0 auto;
+	width: 80%;
+	height: 180px;
+}
+
+.inputField {
+	height: 30px;
+	background-color: white;
+	font-size: 16px;
+	box-sizing: border-box;
+	outline: none;
+	box-shadow: none;
+	border-radius: 5px;
+	-webkit-appearance:none;
+	border:none;
+	text-align: center;
+	color: #333333;
+}
+
+.pathField {
+	width: 100%;
+}
+
+.hostField {
+	width: 100%;
+	margin-top: 40px;
+}
+
+.userField {
+	width: 46%;
+	margin-top: 20px;
+	float: left;
+}
+
+.passwordField {
+	width: 46%;
+	margin-top: 20px;
+	float: right;
+}

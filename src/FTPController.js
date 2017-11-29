@@ -4,6 +4,8 @@ const async = remote.getGlobal('async');
 
 class FTPController {
     constructor(config, rootDir, ftpConnect) {
+		this.start = this.start.bind(this);
+		this.stop = this.stop.bind(this);
 		this.connected = this.connected.bind(this);
 		this.initRootRemoteDir = this.initRootRemoteDir.bind(this);
 		this.setSync = this.setSync.bind(this);
@@ -15,9 +17,11 @@ class FTPController {
 		this.handleRemoveDirJob = this.handleRemoveDirJob.bind(this);
 		this.handleFileJob = this.handleFileJob.bind(this);
 		
+		this.config = config;
 		this.synchronizing = config.synchronizing;
 		this.rootDir = "/" + rootDir;
 		this.client = new ftpClient();
+		this.active = false;
 		this.isSyncing = false;
 		this.ftpConnect = ftpConnect;
 		this.failedJobs = [];
@@ -49,19 +53,27 @@ class FTPController {
 			that.connected();
 		});
 		this.client.on('error', function(err) {
-			if(that.ftpConnect) {
-				that.ftpConnect(err);
+			if(this.active) {
+				if(that.ftpConnect) {
+					that.ftpConnect(err);
+				}
+				console.error(err);
 			}
-			console.error(err);
-		});
-		this.client.connect({
-			host:config.host,
-			port: 21,
-			user:config.user,
-			password:config.password
 		});
 	}
-	check
+	start() {
+		this.active = true;
+		this.client.connect({
+			host:this.config.host,
+			port: 21,
+			user:this.config.user,
+			password:this.config.password
+		});
+	}
+	stop() {
+		this.active = false;
+		this.client.destroy();
+	}
 	connected() {
 		this.initRootRemoteDir();
 	}

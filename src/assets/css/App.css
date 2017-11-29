@@ -12,49 +12,15 @@ div:hover {
 .appWrapper {
 	width: 300px;
 	height: 100vh;
+	padding-top: 20px;
+	box-sizing: border-box;
 	background-color: #22313F;
 }	
 
-.appContent {
-	margin: 0 auto;
+.buttonWrapper {
+	margin: 20px auto;
 	width: 80%;
-	height: 100vh;
-}
-
-.inputField {
-	height: 30px;
-	background-color: white;
-	font-size: 16px;
-	box-sizing: border-box;
-	outline: none;
-	box-shadow: none;
-	border-radius: 5px;
-	-webkit-appearance:none;
-	border:none;
-	text-align: center;
-	color: #333333;
-}
-
-.pathField {
-	width: 100%;
-	margin-top: 40px;
-}
-
-.hostField {
-	width: 100%;
-	margin-top: 40px;
-}
-
-.userField {
-	width: 46%;
-	margin-top: 20px;
-	float: left;
-}
-
-.passwordField {
-	width: 46%;
-	margin-top: 20px;
-	float: right;
+	height: 40px;
 }
 
 .button {
@@ -65,7 +31,6 @@ div:hover {
 	color: white;
 	text-align: center;
 	border-radius: 5px;
-	margin-top: 40px;
 }
 
 .button:hover {
@@ -77,65 +42,17 @@ div:hover {
 	background-color: #F64747;
 }
 
-.cancelDisabled {
-	background-color: #888888;
-	color: #666666;
-}
-
-.cancelDisabled:hover {
-	cursor: default;
-}
-
 .start {
 	float: right;
 	background-color: #2ECC71;
 }
 
-.startDisabled {
+.buttonDisabled {
 	background-color: #888888;
 	color: #666666;
 }
 
-.startDisabled:hover {
+.buttonDisabled:hover {
 	cursor: default;
 }
 
-.statusCanvas {
-	width: 100%;
-	margin-top: 190px;
-	height: 120px;
-}
-
-.statusCanvas > .wrapper {
-	margin: 0 auto;
-	width: 100%;
-	background-color: white;
-	border-radius: 5px;
-	padding: 10px 0;
-	box-sizing: border-box;
-}
-
-.wrapper > .icon {
-	width: 60px;
-	height: 60px;
-	display: block;
-	margin: 15px auto 10px auto;
-}
-
-.wrapper > .rotating {
-	animation:rotateAnimation 4s linear infinite;
-}
-
-@keyframes rotateAnimation { 
-	from {transform:rotate(0deg);}
-    to {transform:rotate(360deg);}
-}
-
-.wrapper > .text {
-	width:100%;
-	font-size: 16px;
-	padding: 10px;
-	box-sizing: border-box;
-	text-align: center;
-	color: #333333;
-}
