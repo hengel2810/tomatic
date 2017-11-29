@@ -92,6 +92,7 @@ class App extends React.Component {
 		var startButtonClass = "button start";
 		var validConfig = this.state.config && this.state.config.isValid();
 		var statusType = "";
+		var configInputActive = true;
 		if(!validConfig) {
 			cancelButtonClass = cancelButtonClass + " buttonDisabled";
 			startButtonClass = startButtonClass + " buttonDisabled";
@@ -100,10 +101,12 @@ class App extends React.Component {
 			cancelButtonClass = cancelButtonClass + " buttonDisabled";
 		}
 		else if(validConfig && this.state.connecting) {
+			configInputActive = false;
 			startButtonClass = startButtonClass + " buttonDisabled";
 			statusType = "sync";
 		}
 		else if(validConfig && this.state.connected) {
+			configInputActive = false;
 			startButtonClass = startButtonClass + " buttonDisabled";
 			statusType = "info";
 			if(this.state.isSync) {
@@ -112,7 +115,7 @@ class App extends React.Component {
 		}
 		return(
 			<div className="appWrapper">
-				<ConfigInput configChange={this.configChange} active={true}/>
+				<ConfigInput configChange={this.configChange} active={configInputActive}/>
 				<div className="buttonWrapper">
 					<div id="cancelButton" className={cancelButtonClass} onClick={this.cancel}>Cancel</div>
 					<div id="startButton" className={startButtonClass} onClick={this.start}>Start</div>
