@@ -14,7 +14,7 @@ On every file change, tomatic will synchronize these changes to the configured F
 </p>
 
 <p>
-This tool was especially developed for development with the Raspberry Pi, but you can use it also for other cases.
+This tool was especially developed for development with the Raspberry Pi, but you can use it for any other cases.
 </p>
 
 ## Configure the Raspberry Pi
