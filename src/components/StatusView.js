@@ -1,14 +1,12 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types"
+import moment from "moment"
 
 import "../assets/css/StatusView.css"
 
-import refreshIcon from '../assets/media/reload.png';
-import checkIcon from '../assets/media/tick.png';
-
-const remote = window.require('electron').remote;
-const moment = remote.getGlobal('moment');
+import refreshIcon from "../assets/media/reload.png";
+import checkIcon from "../assets/media/tick.png";
 
 class StatusView extends React.Component {
   	constructor(props) {
@@ -27,7 +25,7 @@ class StatusView extends React.Component {
 		}
 		else if(this.props.status === "info") {
 			icon = checkIcon;
-			text = moment().format('DD.MM.YYYY, hh:mm:ss');
+			text = moment().format("DD.MM.YYYY, hh:mm:ss");
 			iconClasses = "icon";
 		}
 		else {

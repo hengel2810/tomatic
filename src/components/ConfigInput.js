@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 
 import ConfigObject from "../models/ConfigObject.js"
 import "../assets/css/ConfigInput.css"
+import { request } from "https";
 
 const dialog = window.require('electron').remote.dialog
+
 
 class ConfigInput extends React.Component {
   	constructor(props) {
@@ -47,15 +49,15 @@ class ConfigInput extends React.Component {
 		    "openDirectory"
 		  ]
 		};
-		var that = this;
-		dialog.showOpenDialog(options, function (filePath) { 
-			if(filePath === undefined) { 
-				console.log("No file selected"); 
-			} 
-			else {
-				document.getElementById("pathInput").value = filePath;
-			}
-		});
+		// var that = this;
+		// dialog.showOpenDialog(options, function (filePath) { 
+		// 	if(filePath === undefined) { 
+		// 		console.log("No file selected"); 
+		// 	} 
+		// 	else {
+		// 		document.getElementById("pathInput").value = filePath;
+		// 	}
+		// });
 	}
 	render() {
 		return(
