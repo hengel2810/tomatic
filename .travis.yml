@@ -10,6 +10,8 @@ notifications:
     - hengel2810@gmail.com
     on_success: always
     on_failure: always
+before_install:
+  - sudo apt-get install wine 
 before_deploy:
   - cd release-builds
 deploy:
