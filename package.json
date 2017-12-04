@@ -13,7 +13,8 @@
     "dev": "npm run build && npm run app",
     "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=src/assets/icons/icon.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=src/assets/icons/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Electron Tutorial App\"",
-    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=src/assets/icons/icon.png --prune=true --out=release-builds"
+    "package-linux": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=linux --arch=x64 --icon=src/assets/icons/icon.png --prune=true --out=release-builds",
+    "package":"npm run package-mac && npm run package-win && npm run package-linux"
   },
   "jest": {
     "setupFiles": [
