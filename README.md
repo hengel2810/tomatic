@@ -9,6 +9,10 @@
 <br>
 
 <p>
+	<img src="https://travis-ci.org/hengel2810/tomatic.svg?branch=master"/>
+</p>
+
+<p>
 tomatic is a little development tool which observes a given folder for file changes. 
 On every file change, tomatic will synchronize these changes to the configured FTP server. 
 </p>
@@ -16,6 +20,33 @@ On every file change, tomatic will synchronize these changes to the configured F
 <p>
 This tool was especially developed for development with the Raspberry Pi, but you can use it for any other cases.
 </p>
+
+## Build 
+
+<p>Pull this repository and use the following commands:</p>
+
+Install all dependencies:<br>
+`npm install`
+
+Build React components with webpack:<br>
+`npm run build`
+
+Start Electron app:<br>
+`npm run app`
+
+Build React components with webpack and start Electron app afterwards:<br>
+`npm run dev`
+<br><br>
+Build application:<br>
+
+Mac:<br>
+`npm run package-mac`
+
+Linux:<br>
+`npm run package-linux`
+
+Windows:<br>
+`npm run package-win`
 
 ## Configure the Raspberry Pi
 
