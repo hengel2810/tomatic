@@ -49,15 +49,15 @@ class ConfigInput extends React.Component {
 		    "openDirectory"
 		  ]
 		};
-		// var that = this;
-		// dialog.showOpenDialog(options, function (filePath) { 
-		// 	if(filePath === undefined) { 
-		// 		console.log("No file selected"); 
-		// 	} 
-		// 	else {
-		// 		document.getElementById("pathInput").value = filePath;
-		// 	}
-		// });
+		var that = this;
+		dialog.showOpenDialog(options, function (filePath) { 
+			if(filePath === undefined) { 
+				console.log("No file selected"); 
+			} 
+			else {
+				document.getElementById("pathInput").value = filePath;
+			}
+		});
 	}
 	render() {
 		return(
