@@ -21,6 +21,14 @@ On every file change, tomatic will synchronize these changes to the configured F
 This tool was especially developed for development with the Raspberry Pi, but you can use it for any other cases.
 </p>
 
+## Tests
+
+<p>
+At the moment, testing is not active because I have a problem to implement the tests with Electron, React and Jest. If you have an answer for my problem, feel free to contact me:<br>
+	https://stackoverflow.com/questions/47571610/jest-testing-react-component-using-electron-remote-in-electronjs
+	
+</p>
+
 ## Build 
 
 <p>Pull this repository and use the following commands:</p>
